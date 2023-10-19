@@ -19,4 +19,4 @@ jobs:
         environment_name: Webshop-Environment
         version_label: 1.0.0
         region: eu-central-1
-        deployment_package: webshop-1.0.0.jar
+        deployment_package: webshop-0.0.1-SNAPSHOT.jar
