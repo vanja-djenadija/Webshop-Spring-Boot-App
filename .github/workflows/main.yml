@@ -1,22 +1,48 @@
-name: Deploy main
+# Workflow name
+name: Deploy spring boot app to AWS Elastic Beanstalk
 on:
   push:
-    branches:
-    - main
+    branches: [ "main" ]
     
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
     
-      
-    - name: Beanstalk Deploy for JAR
-      uses: DylanBDev/beanstalk-deploy@initial
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: Webshop
-        environment_name: Webshop-Environment
-        version_label: 1.0.0
-        region: eu-central-1
-        deployment_package: webshop-0.0.1-SNAPSHOT.jar
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'correto'
+          cache: maven
+          
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact
+          path: target/webshop-0.0.1-SNAPSHOT.jar
+
+  deploy:
+      needs: build
+      name: Deploy
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download JAR
+          uses: actions/download-artifact@v2
+          with:
+            name: artifact
+            
+        - name: Beanstalk Deploy for JAR
+          uses: DylanBDev/beanstalk-deploy@initial
+          with:
+            aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            application_name: Webshop
+            environment_name: Webshop-Environment
+            version_label: 1.0.0
+            region: eu-central-1
+            deployment_package: target/webshop-0.0.1-SNAPSHOT.jar
