@@ -2,7 +2,7 @@
 name: Deploy spring boot app to AWS Elastic Beanstalk
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
     
 jobs:
   build:
